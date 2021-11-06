@@ -1,0 +1,8 @@
+# files
+group.asm
+group_int.asm
+personal.asm
+*.txt
+
+# folders
+/.git
