@@ -4,8 +4,9 @@
 # 
 #Data segment
 	.data
-size:	.word	15
-array:	.float	20.0 68.0 4.0 7.0 164.0 15.0 32.0 525.0 56.0 70.0 6.0 90.0 5.0 123.0 40.0
+fileName:	.asciiz		"FLOAT15.BIN"
+size:		.word		15
+array:		.space  	60
 # Statements for Data input 
 prompt_before:	.asciiz	"Before sorting: "
 prompt_after:	.asciiz	" After sorting: "
@@ -15,32 +16,34 @@ prompt_after:	.asciiz	" After sorting: "
 main:
 
 #------------------Input-----------------#
-	la	$a0, prompt_before
-	li	$v0, 4
+	li	$v0, 13			# open file code = 13
+	la	$a0, fileName		# get the file name
+	li	$a1, 0			# set flag = 0 (read file: 0, write flie: 1) 
+	li	$a2, 0			# mode ignored
+	syscall
+	move	$s0, $v0
+	
+	# read data
+	li	$v0, 14			# read file code = 14
+	move	$a0, $s0		# file descriptor
+	la	$a1, array		# the buffer holding
+	la	$a2, 60			# hardcoded buffer length, 60 = 15 * 4 = no_elements * sizeof(float)
+	syscall
+	
+	# close file
+	li	$v0, 16			# close file code = 16
+	move	$a0, $s0		# file descriptor to close
+	syscall
+# print
+	la	$a0, prompt_before	# load prompt address
+	li	$v0, 4			# ready to print string prompt 
 	syscall
 
-# s0 = size, a0 = array, t0 = i (= 0)
-	la	$s0, array
-	addi	$t0, $zero, 0
-	lw	$s1, size
-# for (i = 0; i < size; i++)
-cond1:	
-	beq	$t0, $s1, endfor1
-#begin_loop:
-	addi 	$a0, $zero, ' '
-	li	$v0, 11
-	syscall
+	jal	printArray		# call function to print float array
 
-	lwc1	$f12, 0($s0)	# load float to f12 to print
-	li	$v0, 2		# code 2 to print float
-	syscall
-#end_loop:
-	addi	$s0, $s0, 4
-	addi	$t0, $t0, 1
-	j	cond1
 endfor1:
 #---------------Process-------------#
-
+# Call mergeSort(array, 0, size - 1) 
 	la	$a0, array
 	add	$a1, $zero, $zero
 	lw	$a2, size
@@ -56,25 +59,7 @@ endfor1:
 	li	$v0, 4
 	syscall
 
-# s0 = size, a0 = array, t0 = i (= 0)
-	la	$s0, array
-	addi	$t0, $zero, 0
-	lw	$s1, size
-# for (i = 0; i < size; i++)
-cond2:	
-	beq	$t0, $s1, endfor2
-#begin_loop:
-	addi 	$a0, $zero, ' '
-	li	$v0, 11
-	syscall
-
-	lwc1	$f12, 0($s0)	# load float to f12 to print
-	li	$v0, 2		# code 2 to print float
-	syscall
-#end_loop:
-	addi	$s0, $s0, 4
-	addi	$t0, $t0, 1
-	j	cond2
+	jal	printArray		# call function to print float array
 endfor2:
 	
 	li	$v0, 10
@@ -159,28 +144,26 @@ merge:
 	c.le.s	$f0, $f1
 	bc1t	return
 # while (start <= mid && start_r <= end)
-# !mid < start
-# !end < start_r
-# !(... || ...) 
+
 begin_while:
-	slt	$t0, $a2, $a1
-	slt	$t1, $a3, $s0
-	or	$t0, $t0, $t1
-	bnez	$t0, end_while
+	slt	$t0, $a2, $a1		# mid < start
+	slt	$t1, $a3, $		# end < start_r
+	or	$t0, $t0, $t1		# (... || ...)
+	bnez	$t0, end_while		# => while !(..) 
 #begin_do
 # s1 = arr + start, s2 = arr + start_r
-	sll	$t2, $a1, 2
-	add	$s1, $a0, $t2
-	lwc1	$f0, 0($s1)	# f0 = arr[start]
-	sll	$t2, $s0, 2
-	add	$s2, $a0, $t2
-	lwc1	$f1, 0($s2)	# f1 = arr[start_r]
+	sll	$t2, $a1, 2		# calculate start x float block 
+	add	$s1, $a0, $t2		# arr + start
+	lwc1	$f0, 0($s1)		# f0 = arr[start]
+	sll	$t2, $s0, 2		# calculate start_r x float block 
+	add	$s2, $a0, $t2		# arr + start_r
+	lwc1	$f1, 0($s2)		# f1 = arr[start_r]
 	
 #begin_if2  if (arr[start] <= arr[start_r]
 	c.le.s	$f0, $f1
 	bc1f if_false2
 if_true2:
-	addi	$a1, $a1, 1 # start++ 
+	addi	$a1, $a1, 1 		# start++ 
 	j	end_if2
 if_false2:
 #reuse f1 for temp = arr[start_r]
@@ -195,10 +178,10 @@ cond3:
 	addi	$s2, $s2, -4
 	j	cond3
 end_for3:
-	swc1	$f1, 0($s1)	#arr[start] = tmp
-	addi	$a1, $a1, 1	#start++
-	addi	$a2, $a2, 1	#mid++
-	addi	$s0, $s0, 1	#start_r++
+	swc1	$f1, 0($s1)		#arr[start] = tmp
+	addi	$a1, $a1, 1		#start++
+	addi	$a2, $a2, 1		#mid++
+	addi	$s0, $s0, 1		#start_r++
 end_if2:
 	j 	begin_while
 #end_do
@@ -209,4 +192,38 @@ return:
 	lw	$a3,  8($sp)
 	lw	$ra, 12($sp)
 	addi	$sp, $sp, 16
+	jr	$ra
+
+
+#####################################
+# function printArray()
+printArray:
+# preserve a0
+	addi	$sp, $sp, -8
+	sw	$a0, 0($sp)
+	sw	$ra, 4($sp)
+#------------------------------------------------#
+	# s0 = size, a0 = array
+	la	$s0, array
+	lw	$s1, size
+	sll	$s1, $s1, 2
+	add	$s1, $s0, $s1
+	# for (i = 0; i < size; i++)
+cond:
+	beq	$s0, $s1, endfor
+#begin_loop:
+	addi 	$a0, $zero, ' '
+	li	$v0, 11
+	syscall
+
+	lwc1	$f12, 0($s0)		# load float to f12 to print
+	li	$v0, 2			# code 2 to print float
+	syscall
+#end_loop:
+	addi	$s0, $s0, 4
+	j	cond
+endfor:
+	lw	$a0, 0($sp)
+	lw	$ra, 4($sp)
+	addi	$sp, $sp, 4
 	jr	$ra
