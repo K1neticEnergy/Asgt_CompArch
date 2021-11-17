@@ -108,7 +108,10 @@ mergeSort:
 	lw	$a2, 12($sp) 
 	jal 	mergeSort
 	
-
+	addi 	$a0, $zero, '\n'
+	li	$v0, 11
+	syscall
+	jal	printArray
 #call	mergeSort(array, mid + 1, right)
 	lw	$a0,  0($sp)
 	lw	$a1, 12($sp)
@@ -116,7 +119,10 @@ mergeSort:
 	lw	$a2, 8($sp)
 	jal 	mergeSort
 	
-	
+	addi 	$a0, $zero, '\n'
+	li	$v0, 11
+	syscall
+	jal	printArray	
 #call	merge(array, start, mid, end)
 	lw	$a0,   0($sp)
 	lw	$a1,   4($sp)
