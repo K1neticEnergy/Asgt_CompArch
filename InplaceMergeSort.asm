@@ -1,7 +1,14 @@
-# Merge sort
-# Comparison sort
-# Use recursion
-# 
+################################################################################## 
+# Assignment - Problem 3
+# Group L01 - 12:
+#     Pham Thi Hong Hieu
+#
+#
+#     Tran Ha Tuan Kiet
+#	Id: 2011493
+#	Email: kiet.trank1netic@hcmut.edu.vn
+# Implementation of Merge sort using recursion, no more than 1 array is use. 
+##################################################################################
 #Data segment
 	.data
 fileName:	.asciiz		"FLOAT15.BIN"
@@ -65,12 +72,14 @@ endfor2:
 	li	$v0, 10
 	syscall
 
-######################
-# function mergeSort #
-# Inp: a0 = array    #
-#      a1 = left     #
-#      a2 = right    #
-######################
+#############################################################
+# function mergeSort(array, left, right)
+# a0: array   
+# a1: left     
+# a2: right
+# No output
+# Description: Recursively sort an array from left to right 
+#############################################################
 
 mergeSort:
 # Set stack pointer
@@ -98,6 +107,7 @@ mergeSort:
 	lw	$a1,  4($sp)
 	lw	$a2, 12($sp) 
 	jal 	mergeSort
+	
 
 #call	mergeSort(array, mid + 1, right)
 	lw	$a0,  0($sp)
@@ -106,12 +116,18 @@ mergeSort:
 	lw	$a2, 8($sp)
 	jal 	mergeSort
 	
+	
 #call	merge(array, start, mid, end)
 	lw	$a0,   0($sp)
 	lw	$a1,   4($sp)
 	lw	$a2,  12($sp)
 	lw	$a3,   8($sp)
 	jal	merge
+	
+	addi 	$a0, $zero, '\n'
+	li	$v0, 11
+	syscall
+	jal	printArray
 	
 endif1:
 	lw	$ra, 16($sp)
@@ -121,9 +137,17 @@ endif1:
 	addi	$sp, $sp, 20
 	jr	$ra
 
-##########################################
+#################################################################
 # function merge(array, start, mid, end)
-##########################################
+# a0: array
+# a1: start
+# a2: mid
+# a3: end 
+# No output
+# Description: merge 2 sub-arrays which are (nearly) the same size
+# by choosing between 2 beginning elements of 2 sub-arrays which 
+# one is smaller, then popping out.
+#################################################################
 merge:
 	addi	$sp, $sp, -16
 	sw	$a1,  0($sp)
@@ -225,5 +249,5 @@ cond:
 endfor:
 	lw	$a0, 0($sp)
 	lw	$ra, 4($sp)
-	addi	$sp, $sp, 4
+	addi	$sp, $sp, 8
 	jr	$ra
