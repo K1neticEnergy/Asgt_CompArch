@@ -6,7 +6,7 @@
 #
 #     Tran Ha Tuan Kiet
 #	Id: 2011493
-#	Email: kiet.trank1netic@hcmut.edu.vn
+#
 # Implementation of Merge sort using recursion, no more than 1 array is use. 
 ##################################################################################
 #Data segment
@@ -23,22 +23,22 @@ prompt_after:	.asciiz	" After sorting: "
 main:
 
 #------------------Input-----------------#
-	li	$v0, 13			# open file code = 13
-	la	$a0, fileName		# get the file name
-	li	$a1, 0			# set flag = 0 (read file: 0, write flie: 1) 
-	li	$a2, 0			# mode ignored
+	li	$v0, 13			# Set $v0=13 to open a file
+	la	$a0, fileName		# Get the directory of the file
+	li	$a1, 0			# Set flag=0 (0 for reading, 1 for writing) 
+	li	$a2, 0			# Mode is ignored
 	syscall
-	move	$s0, $v0
+	move	$s0, $v0		# Placing the descriptor in $s0 for later-use 
 	
 	# read data
-	li	$v0, 14			# read file code = 14
-	move	$a0, $s0		# file descriptor
-	la	$a1, array		# the buffer holding
-	la	$a2, 60			# hardcoded buffer length, 60 = 15 * 4 = no_elements * sizeof(float)
+	li	$v0, 14			# Set $v0=14 to read the file
+	move	$a0, $s0		# Move descriptor to $a0
+	la	$a1, array		# Address buffer to read
+	la	$a2, 60			# Hard-code buffer length = size * sizeof(float)
 	syscall
 	
 	# close file
-	li	$v0, 16			# close file code = 16
+	li	$v0, 16			# Set $v0=16 to close the file
 	move	$a0, $s0		# file descriptor to close
 	syscall
 # print
