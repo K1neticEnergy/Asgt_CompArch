@@ -2,7 +2,7 @@
 # Assignment - Problem 3
 # Group L01 - 12:
 #     Pham Thi Hong Hieu
-#
+#	Id: 2020025
 #
 #     Tran Ha Tuan Kiet
 #	Id: 2011493
@@ -83,51 +83,51 @@ endfor2:
 
 mergeSort:
 # Set stack pointer
-	addi	$sp, $sp, -20
-	sw	$a0, 0($sp)
-	sw	$a1, 4($sp)
-	sw	$a2, 8($sp)
+	addi	$sp, $sp, -20	# initiate stack
+	sw	$a0, 0($sp)	# save array address
+	sw	$a1, 4($sp)	# save left
+	sw	$a2, 8($sp)	# save right
 	sw	$ra, 16($sp)
 #----------------------------#
 # t0 = left, t1 = right
-	lw	$t0, 4($sp)
-	lw	$t1, 8($sp)
+	lw	$t0, 4($sp)	# load value of left to $t0
+	lw	$t1, 8($sp)	# load value of right to $t1
 
 #if (left < right)
 	bge	$t0, $t1, endif1
 
 # s0 = mid = left + (right - left) / 2 = t0 + (t1 - t0) / 2
-	sub	$s0, $t1, $t0
-	srl	$s0, $s0, 1
-	add	$s0, $s0, $t0
-	sw	$s0, 12($sp)
+	sub	$s0, $t1, $t0	# $s0 = right - left
+	srl	$s0, $s0, 1	# $s0 = $s0/2 = (right - left)/2 
+	add	$s0, $s0, $t0	# $s0 = $s0 + left = left + (right - left) / 2
+	sw	$s0, 12($sp)	# save mid 
 	
 #call 	mergeSort(array, left, mid)
-	lw	$a0,  0($sp)
-	lw	$a1,  4($sp)
-	lw	$a2, 12($sp) 
+	lw	$a0,  0($sp)	# array = $a0
+	lw	$a1,  4($sp)	# left = $a1
+	lw	$a2, 12($sp) 	# mid = $a2
 	jal 	mergeSort
-	
-	addi 	$a0, $zero, '\n'
-	li	$v0, 11
+# print	
+	addi 	$a0, $zero, '\n' 
+	li	$v0, 11	
 	syscall
-	jal	printArray
+	jal	printArray	# print array
 #call	mergeSort(array, mid + 1, right)
-	lw	$a0,  0($sp)
-	lw	$a1, 12($sp)
-	addi	$a1, $a1, 1
-	lw	$a2, 8($sp)
+	lw	$a0,  0($sp)	# array = $a0
+	lw	$a1, 12($sp)	# mid = $a1
+	addi	$a1, $a1, 1	# $a1 = mid + 1
+	lw	$a2, 8($sp)	# right = $a2
 	jal 	mergeSort
-	
+# print
 	addi 	$a0, $zero, '\n'
 	li	$v0, 11
 	syscall
 	jal	printArray	
 #call	merge(array, start, mid, end)
-	lw	$a0,   0($sp)
-	lw	$a1,   4($sp)
-	lw	$a2,  12($sp)
-	lw	$a3,   8($sp)
+	lw	$a0,   0($sp)	# array = $a0
+	lw	$a1,   4($sp)	# start = $a1
+	lw	$a2,  12($sp)	# mid = $a2
+	lw	$a3,   8($sp)	# end = $a3
 	jal	merge
 	
 	addi 	$a0, $zero, '\n'
@@ -155,11 +155,11 @@ endif1:
 # one is smaller, then popping out.
 #################################################################
 merge:
-	addi	$sp, $sp, -16
-	sw	$a1,  0($sp)
-	sw	$a2,  4($sp)
-	sw	$a3,  8($sp)
-	sw	$ra, 12($sp)
+	addi	$sp, $sp, -16	# Preserve stack
+	sw	$a1,  0($sp)	# save start = $a1
+	sw	$a2,  4($sp)	# save mid = $a2
+	sw	$a3,  8($sp)	# save end = $a3
+	sw	$ra, 12($sp)	# save the return address
 #----------------------------------------#
 # s0 = start_r, a1 = start, a2 = mid, a3 = end
 	addi	$s0, $a2, 1
@@ -199,11 +199,11 @@ if_false2:
 #reuse f1 for temp = arr[start_r]
 #begin_for 
 cond3:
-	sub	$t0, $s2, $s1
-	beqz	$t0, end_for3
+	sub	$t0, $s2, $s1 		# index--;
+	beqz	$t0, end_for3		# while (index != start)
 #begin_loop: arr[i] = arr[i - 1]
-	lwc1	$f0, -4($s2)
-	swc1	$f0, 0($s2)
+	lwc1	$f0, -4($s2)		# Load arr[i - 1]
+	swc1	$f0, 0($s2)		# Assign arr[i] = arr[i - 1]
 #end_loop:
 	addi	$s2, $s2, -4
 	j	cond3
@@ -230,27 +230,27 @@ return:
 printArray:
 # preserve a0
 	addi	$sp, $sp, -8
-	sw	$a0, 0($sp)
+	sw	$a0, 0($sp)		# Preserve the address $a0 of array
 	sw	$ra, 4($sp)
 #------------------------------------------------#
 	# s0 = size, a0 = array
-	la	$s0, array
-	lw	$s1, size
-	sll	$s1, $s1, 2
-	add	$s1, $s0, $s1
+	la	$s0, array		# Load the address of array to $s0
+	lw	$s1, size		# Load size of array to $s1 = size = 15
+	sll	$s1, $s1, 2		# byte offset from arr[0] to arr[14]
+	add	$s1, $s0, $s1		# add offset to the address of arr[0]; $s1 = addr of arr[14]
 	# for (i = 0; i < size; i++)
 cond:
-	beq	$s0, $s1, endfor
+	beq	$s0, $s1, endfor	# if (i ($s0) < size ($s1)), jump to endfor
 #begin_loop:
-	addi 	$a0, $zero, ' '
-	li	$v0, 11
+	addi 	$a0, $zero, ' '		# Load a space character to $a0
+	li	$v0, 11			# Print a space
 	syscall
 
 	lwc1	$f12, 0($s0)		# load float to f12 to print
 	li	$v0, 2			# code 2 to print float
 	syscall
 #end_loop:
-	addi	$s0, $s0, 4
+	addi	$s0, $s0, 4		# Move 4 bytes to the address of arr[i+1]
 	j	cond
 endfor:
 	lw	$a0, 0($sp)
