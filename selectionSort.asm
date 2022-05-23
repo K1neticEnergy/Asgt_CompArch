@@ -5,8 +5,8 @@
 #	Id: 2011493
 #	Email: kiet.trank1netic@hcmut.edu.vn
 #
-#     <Your name Here>
-#	Id: 2020025
+#     Quach Minh Duc
+#	Id: 2010231
 #
 # Implementation of Selection sort. 
 ##################################################################################
@@ -35,7 +35,7 @@ main:
 	li	$v0, 14			# read file code = 14
 	move	$a0, $s0		# file descriptor
 	la	$a1, array		# the buffer holding
-	la	$a2, 60			# hardcoded buffer length, 60 = 15 * 4 = no_elements * sizeof(float)
+	la	$a2, 40			# hardcoded buffer length, 40 = 10 * 4 = no_elements * sizeof(float)
 	syscall
 	
 	# close file
@@ -84,18 +84,18 @@ endfor2:
 
 selectionSort:
 # Set stack pointer
-	addi	$sp, $sp, -20	# initiate stack
+	addi	$sp, $sp, -16	# initiate stack
 	sw	$a0, 0($sp)	# save array address
 	sw	$a1, 4($sp)	# save left
 	sw	$a2, 8($sp)	# save right
-	sw	$ra, 16($sp)
+	sw	$ra, 12($sp)
 #----------------------------#
 
 ## TODO
 
 #----------------------------#
 # Reset stack pointer
-	lw	$ra, 16($sp)
+	lw	$ra, 12($sp)
 	lw	$a0,  0($sp)
 	lw	$a1,  4($sp)
 	lw	$a2,  8($sp)
@@ -118,9 +118,9 @@ printArray:
 #------------------------------------------------#
 	# s0 = size, a0 = array
 	la	$s0, array		# Load the address of array to $s0
-	lw	$s1, size		# Load size of array to $s1 = size = 15
-	sll	$s1, $s1, 2		# byte offset from arr[0] to arr[14]
-	add	$s1, $s0, $s1		# add offset to the address of arr[0]; $s1 = addr of arr[14]
+	lw	$s1, size		# Load size of array to $s1 = size = 10
+	sll	$s1, $s1, 2		# byte offset from arr[0] to arr[9]
+	add	$s1, $s0, $s1		# add offset to the address of arr[0]; $s1 = addr of arr[9]
 	# for (i = 0; i < size; i++)
 cond:
 	beq	$s0, $s1, endfor	# if (i ($s0) < size ($s1)), jump to endfor
