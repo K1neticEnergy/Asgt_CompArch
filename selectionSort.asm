@@ -35,7 +35,7 @@ main:
 	li	$v0, 14			# read file code = 14
 	move	$a0, $s0		# file descriptor
 	la	$a1, array		# the buffer holding
-	la	$a2, 60			# hardcoded buffer length, 60 = 15 * 4 = no_elements * sizeof(float)
+	la	$a2, 60			# hardcoded buffer length, 40 = 10 * 4 = no_elements * sizeof(float)
 	syscall
 	
 	# close file
